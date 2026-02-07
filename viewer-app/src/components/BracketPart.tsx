@@ -26,15 +26,13 @@ const BracketPart: React.FC<BracketPartProps> = ({
     }, [url]);
 
     const geometry = useMemo(() => {
-        if (!data || data.shapes.length === 0) return null;
+        if (!data || data.shapes.length === 0) {
+            console.log('[BracketPart] No shapes found in:', url);
+            return null;
+        }
 
-        // Combine all shapes into one geometry or process them individually
-        // For the MVP, we'll take the first major shape
         const shape = data.shapes[0];
 
-        // Filter out holes that are within the geometry of the main shape
-        // In a more robust version, we'd use boolean operations or check containment
-        shape.holes = data.holes;
 
         const extrudeSettings = {
             steps: 1,
@@ -48,12 +46,17 @@ const BracketPart: React.FC<BracketPartProps> = ({
 
         const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
-        // CENTER THE GEOMETRY
         geom.computeBoundingBox();
+        const size = new THREE.Vector3();
+        geom.boundingBox!.getSize(size);
+        console.log(`[BracketPart] Loaded ${url}. Size:`, size);
+
+        // Center it
         geom.center();
 
         return geom;
-    }, [data, thickness]);
+    }, [data, thickness, url]);
+
 
 
     if (!geometry) return null;
@@ -69,12 +72,13 @@ const BracketPart: React.FC<BracketPartProps> = ({
         >
             <meshStandardMaterial
                 color={color}
-                metalness={0.8}
+                metalness={1}
                 roughness={0.2}
                 side={THREE.DoubleSide}
             />
         </mesh>
     );
 };
+
 
 export default BracketPart;

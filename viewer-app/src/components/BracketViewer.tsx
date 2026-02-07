@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Stage } from '@react-three/drei';
+
 import BracketPart from './BracketPart';
 
 interface BracketViewerProps {
@@ -24,24 +25,25 @@ const BracketViewer: React.FC<BracketViewerProps> = ({ sku, options }) => {
         if (sku === 'UPB10') {
             return (
                 <group>
-                    {/* Bottom */}
+                    {/* Bottom Plate */}
                     <BracketPart
                         url={getUrl('UPB10/Jack Smith-24-UPB .25 Bottom.DXF')}
                         thickness={0.25}
-                        position={[0, 0, 0]}
+                        position={[0, -0.25, 0]}
+                        rotation={[Math.PI / 2, 0, 0]}
                     />
-                    {/* Left side */}
+                    {/* Side A */}
                     <BracketPart
                         url={getUrl('UPB10/Jack Smith-24-UPB .25 Lside.DXF')}
                         thickness={0.25}
-                        position={[-3, 3, 0]}
+                        position={[-3, 4, 0]}
                         rotation={[0, Math.PI / 2, 0]}
                     />
-                    {/* Right side */}
+                    {/* Side B */}
                     <BracketPart
                         url={getUrl('UPB10/Jack Smith-24-UPB .25 Rside.DXF')}
                         thickness={0.25}
-                        position={[3, 3, 0]}
+                        position={[3, 4, 0]}
                         rotation={[0, -Math.PI / 2, 0]}
                     />
                 </group>
@@ -52,21 +54,28 @@ const BracketViewer: React.FC<BracketViewerProps> = ({ sku, options }) => {
     };
 
     return (
-        <div style={{ width: '100%', height: '100vh', background: 'radial-gradient(circle, #ffffff 0%, #e0e0e0 100%)' }}>
+        <div style={{ width: '100%', height: '100vh', background: '#e8e8e8' }}>
             <Canvas shadows>
-                <PerspectiveCamera makeDefault position={[12, 12, 12]} fov={40} />
+                <PerspectiveCamera makeDefault position={[30, 30, 30]} fov={35} />
 
                 <Suspense fallback={null}>
-                    <group position={[0, -3, 0]}>
-                        {renderParts()}
-                    </group>
-                    <Environment preset="city" />
-                    <ContactShadows opacity={0.4} scale={20} blur={2.4} far={10} />
+                    <Stage
+                        intensity={0.5}
+                        environment="city"
+                        adjustCamera={false}
+                        shadows={{ type: 'contact', opacity: 0.2, blur: 2 }}
+                    >
+                        <group rotation={[0, -Math.PI / 4, 0]}>
+                            {renderParts()}
+                        </group>
+                    </Stage>
                 </Suspense>
-                <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
+
+                <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.5} />
             </Canvas>
         </div>
     );
 };
+
 
 export default BracketViewer;
