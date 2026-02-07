@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.local
+.env
+viewer-app/node_modules
+viewer-app/dist
